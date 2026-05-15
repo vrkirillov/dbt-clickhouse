@@ -222,21 +222,24 @@
 {%- endmacro -%}
 
 {% macro order_by_cause(label) %}
-  {%- set order_by = config.get('order_by', validator=validation.any[list, basestring]) -%}
-  {%- set engine = config.get('engine', default='MergeTree()') -%}
+  {%- set primary_key = config.get("primary_key") -%}
+  {%- set order_by = config.get("order_by", validator=validation.any[list, basestring]) -%}
+  {%- set engine = config.get("engine", default="MergeTree") -%}
   {%- set supported = [
-    'HDFS',
-    'MaterializedPostgreSQL',
-    'S3',
-    'EmbeddedRocksDB',
-    'Hive'
+    "HDFS",
+    "MaterializedPostgreSQL",
+    "S3",
+    "EmbeddedRocksDB",
+    "Hive"
   ] -%}
 
-  {%- if 'MergeTree' in engine or engine in supported %}
+  {%- if "MergeTree" in engine or engine in supported %}
     {%- if order_by is not none %}
       {{ make_columns(label=label, columns=order_by) }}
     {%- else %}
-      {{ label }} (tuple())
+      {%- if primary_key is none %}
+        {{ label }} (tuple())
+      {%- endif %}
     {%- endif %}
   {%- endif %}
 {%- endmacro -%}
