@@ -1,7 +1,7 @@
 import pytest
+from dbt.tests.adapter.basic.files import schema_base_yml, seeds_base_csv
 from dbt.tests.adapter.basic.test_table_materialization import BaseTableMaterialization
-from dbt.tests.adapter.basic.files import seeds_base_csv, schema_base_yml
-from dbt.tests.util import run_dbt, run_dbt_and_capture, relation_from_name
+from dbt.tests.util import relation_from_name, run_dbt, run_dbt_and_capture
 
 
 class TestTableMat(BaseTableMaterialization):
