@@ -279,6 +279,7 @@ SELECT
 FROM {{ source('raw', 'seed') }}
 """
 
+
 def get_table_columns(project, table_name):
     """Helper function to get the primary_key, sorting_key columns of a table."""
     relation = relation_from_name(project.adapter, table_name)
@@ -289,6 +290,7 @@ def get_table_columns(project, table_name):
         fetch="one",
     )
     return (result[0], result[1])
+
 
 class TestTableWithPrimaryKeyDeclare:
     @pytest.fixture(scope="class")
@@ -304,7 +306,8 @@ class TestTableWithPrimaryKeyDeclare:
             "table_primary_key.sql": table_model_with_pk,
             "table_primary_key.yml": table_schema_with_pk + table_schema_columns,
             "table_primary_key_and_order_by.sql": table_model_with_pk,
-            "table_primary_key_and_order_by.yml": table_schema_with_pk_and_order + table_schema_columns,
+            "table_primary_key_and_order_by.yml": table_schema_with_pk_and_order 
+                + table_schema_columns,
         }
 
     def test_primary_key_and_order_by_definitions(self, project):
