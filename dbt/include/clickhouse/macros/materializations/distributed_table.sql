@@ -126,7 +126,7 @@
   )
   
   {{ engine_clause() }}
-  {{ order_by_cause(label="order by") }}
+  {{ order_by_clause(label="order by") }}
   {{ primary_key_clause(label="primary key") }}
   {{ partition_by_clause(label="partition by") }}
   {{ ttl_config(label="ttl")}}

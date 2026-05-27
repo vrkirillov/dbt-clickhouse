@@ -221,7 +221,7 @@
   {%- endif %}
 {%- endmacro -%}
 
-{% macro order_by_cause(label) %}
+{% macro order_by_clause(label) %}
   {%- set primary_key = config.get("primary_key") -%}
   {%- set order_by = config.get("order_by", validator=validation.any[list, basestring]) -%}
   {%- set engine = config.get("engine", default="MergeTree") -%}
@@ -331,7 +331,7 @@
           {{ get_table_columns_and_constraints() }}
         {%- endif %}
         {{ engine_clause() }}
-        {{ order_by_cause(label="order by") }}
+        {{ order_by_clause(label="order by") }}
         {{ primary_key_clause(label="primary key") }}
         {{ partition_by_clause(label="partition by") }}
         {{ ttl_config(label="ttl")}}
