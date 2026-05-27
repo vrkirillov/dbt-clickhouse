@@ -5,6 +5,30 @@
 * Populate `query_id` in `AdapterResponse` for every executed query. The query ID is generated as a UUID4 and forwarded to ClickHouse, making it available via `adapter_response` in dbt artifacts and enabling tools like Elementary to correlate dbt model runs with entries in `system.query_log`.
 * Replaced legacy `docker-compose` commands with `docker compose` (V2)
 * Updated GitHub Actions workflow to use Docker Compose V2
+* Added support for using PRIMARY KEY in MergeTree family table definitions in place of ORDER BY
+* Added support lists of columns in PRIMARY KEY declarations
+For example:
+
+  ```yaml
+  models:
+    - name: <model name>
+      config:
+        materialized: table
+        primary_key:
+          - event_date
+          - id
+      ...
+  ```
+
+  ```sql
+  {{ 
+    config(
+      materialized="table",
+      primary_key=["event_date", "id"]
+    ) 
+  }}
+  ...
+  ```
 
 ### Release [1.10.0], 2026-02-16
 

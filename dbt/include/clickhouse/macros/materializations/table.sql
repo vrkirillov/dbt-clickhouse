@@ -195,53 +195,51 @@
   {{ return(dbt_mvs) }}
 {% endmacro %}
 
-{% macro partition_cols(label) %}
-  {%- set cols = config.get('partition_by', validator=validation.any[list, basestring]) -%}
-  {%- if cols is not none %}
-    {%- if cols is string -%}
-      {%- set cols = [cols] -%}
-    {%- endif -%}
-    {{ label }} (
-    {%- for item in cols -%}
-      {{ item }}
-      {%- if not loop.last -%},{%- endif -%}
-    {%- endfor -%}
-    )
+{% macro make_columns(label, columns) %}
+  {%- if columns is string -%}
+    {%- set columns = [columns] -%}
+  {%- endif -%}
+  {{ label }} (
+  {%- for item in columns -%}
+    {{ item }}
+    {%- if not loop.last -%},{%- endif -%}
+  {%- endfor -%}
+  )
+{%- endmacro -%}
+
+{% macro partition_by_clause(label) %}
+  {%- set partition_by = config.get('partition_by', validator=validation.any[list, basestring]) -%}
+  {%- if partition_by is not none %}
+    {{ make_columns(label=label, columns=partition_by) }}
   {%- endif %}
 {%- endmacro -%}
 
 {% macro primary_key_clause(label) %}
-  {%- set primary_key = config.get('primary_key', validator=validation.any[basestring]) -%}
-
+  {%- set primary_key = config.get('primary_key', validator=validation.any[list, basestring]) -%}
   {%- if primary_key is not none %}
-    {{ label }} {{ primary_key }}
+    {{ make_columns(label=label, columns=primary_key) }}
   {%- endif %}
 {%- endmacro -%}
 
-{% macro order_cols(label) %}
-  {%- set cols = config.get('order_by', validator=validation.any[list, basestring]) -%}
-  {%- set engine = config.get('engine', default='MergeTree()') -%}
+{% macro order_by_clause(label) %}
+  {%- set primary_key = config.get("primary_key") -%}
+  {%- set order_by = config.get("order_by", validator=validation.any[list, basestring]) -%}
+  {%- set engine = config.get("engine", default="MergeTree") -%}
   {%- set supported = [
-    'HDFS',
-    'MaterializedPostgreSQL',
-    'S3',
-    'EmbeddedRocksDB',
-    'Hive'
+    "HDFS",
+    "MaterializedPostgreSQL",
+    "S3",
+    "EmbeddedRocksDB",
+    "Hive"
   ] -%}
 
-  {%- if 'MergeTree' in engine or engine in supported %}
-    {%- if cols is not none %}
-      {%- if cols is string -%}
-        {%- set cols = [cols] -%}
-      {%- endif -%}
-      {{ label }} (
-      {%- for item in cols -%}
-        {{ item }}
-        {%- if not loop.last -%},{%- endif -%}
-      {%- endfor -%}
-      )
+  {%- if "MergeTree" in engine or engine in supported %}
+    {%- if order_by is not none %}
+      {{ make_columns(label=label, columns=order_by) }}
     {%- else %}
-      {{ label }} (tuple())
+      {%- if primary_key is none %}
+        {{ label }} (tuple())
+      {%- endif %}
     {%- endif %}
   {%- endif %}
 {%- endmacro -%}
@@ -333,9 +331,9 @@
           {{ get_table_columns_and_constraints() }}
         {%- endif %}
         {{ engine_clause() }}
-        {{ order_cols(label="order by") }}
         {{ primary_key_clause(label="primary key") }}
-        {{ partition_cols(label="partition by") }}
+        {{ order_by_clause(label="order by") }}
+        {{ partition_by_clause(label="partition by") }}
         {{ ttl_config(label="ttl")}}
         {{ adapter.get_model_settings(model, config.get('engine', default='MergeTree')) }}
 
