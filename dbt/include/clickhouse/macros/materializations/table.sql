@@ -331,8 +331,8 @@
           {{ get_table_columns_and_constraints() }}
         {%- endif %}
         {{ engine_clause() }}
-        {{ order_by_clause(label="order by") }}
         {{ primary_key_clause(label="primary key") }}
+        {{ order_by_clause(label="order by") }}
         {{ partition_by_clause(label="partition by") }}
         {{ ttl_config(label="ttl")}}
         {{ adapter.get_model_settings(model, config.get('engine', default='MergeTree')) }}
