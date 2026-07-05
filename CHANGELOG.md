@@ -6,7 +6,7 @@
 * Replaced legacy `docker-compose` commands with `docker compose` (V2)
 * Updated GitHub Actions workflow to use Docker Compose V2
 * Added support for using PRIMARY KEY in MergeTree family table definitions in place of ORDER BY
-* Added support lists of columns in PRIMARY KEY declarations
+* Added support for lists of columns in PRIMARY KEY declarations
 For example:
 
   ```yaml
