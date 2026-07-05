@@ -195,12 +195,12 @@
   {{ return(dbt_mvs) }}
 {% endmacro %}
 
-{% macro make_columns(label, columns) %}
-  {%- if columns is string -%}
-    {%- set columns = [columns] -%}
+{% macro expression_list_clause(label, expressions) %}
+  {%- if expressions is string -%}
+    {%- set expressions = [expressions] -%}
   {%- endif -%}
   {{ label }} (
-  {%- for item in columns -%}
+  {%- for item in expressions -%}
     {{ item }}
     {%- if not loop.last -%},{%- endif -%}
   {%- endfor -%}
@@ -210,14 +210,14 @@
 {% macro partition_by_clause(label) %}
   {%- set partition_by = config.get('partition_by', validator=validation.any[list, basestring]) -%}
   {%- if partition_by is not none %}
-    {{ make_columns(label=label, columns=partition_by) }}
+    {{ expression_list_clause(label=label, expressions=partition_by) }}
   {%- endif %}
 {%- endmacro -%}
 
 {% macro primary_key_clause(label) %}
   {%- set primary_key = config.get('primary_key', validator=validation.any[list, basestring]) -%}
   {%- if primary_key is not none %}
-    {{ make_columns(label=label, columns=primary_key) }}
+    {{ expression_list_clause(label=label, expressions=primary_key) }}
   {%- endif %}
 {%- endmacro -%}
 
@@ -235,11 +235,11 @@
 
   {%- if "MergeTree" in engine or engine in supported %}
     {%- if order_by is not none %}
-      {{ make_columns(label=label, columns=order_by) }}
+      {{ expression_list_clause(label=label, expressions=order_by) }}
+    {%- elif primary_key is not none %}
+      {{ expression_list_clause(label=label, expressions=primary_key) }}
     {%- else %}
-      {%- if primary_key is none %}
-        {{ label }} (tuple())
-      {%- endif %}
+      {{ label }} (tuple())
     {%- endif %}
   {%- endif %}
 {%- endmacro -%}
