@@ -1,3 +1,12 @@
+### Release [1.10.2], 2026-0X-XX
+
+#### Improvements
+
+#### Repository maintenance
+
+* Replace black and isort with ruff
+
+
 ### Release [1.10.1], 2026-06-16
 
 #### Improvements
